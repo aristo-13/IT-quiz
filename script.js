@@ -1,5 +1,4 @@
 
-
 const timer = document.querySelector('.time');
 const progress = document.querySelector('.progress');
 const btn = document.querySelector('.next');
@@ -20,6 +19,7 @@ let correctAnswer = ' ';
 let options = [];
 let choice = '';
 let score = 0;
+let is_checked = false
 
 function timing() {
   timeInterval = setInterval(() => {
@@ -52,7 +52,7 @@ function fetchQuestion(questionNumber) {
   fetch('https://opentdb.com/api.php?amount=10&category=18&difficulty=medium')
     .then((response) => {
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+       throw new Error('Network response was not ok');
       }
       return response.json();
     })
@@ -65,25 +65,20 @@ function fetchQuestion(questionNumber) {
 
       options.forEach((option) => {
         optionsContainer.innerHTML += `
-          <div class='opt1'>
+          <button class='opt1'>
             <span class='spa'>${option}</span>
             <input type='radio' name='option' class='radiocheck'>
-          </div>
+          </button>
         `;
       });
 
-      const optt = document.querySelectorAll('.opt1');
-      optt.forEach((el) => {
-        el.classList.remove('correct');
-        el.classList.remove('wrong');
-        el.addEventListener('click', () => {
-          choice = el.querySelector('.spa').textContent;
-          el.querySelector('.radiocheck').setAttribute('checked', 'true');
-          el.classList.add(choice === correctAnswer ? 'correct' : 'wrong');
-        });
-      });
+      handleCheck()
     })
-    .catch(showError);
+    .catch((err) =>{
+      console.log(err)
+      errorPage.style.display = 'block';
+      message.textContent = 'An Error Occurred';
+    });
 }
 
 function checkAns(choice) {
@@ -94,6 +89,8 @@ function checkAns(choice) {
 }
 
 function showScore() {
+  questionNumber = 10;
+  btn.textContent = 'DONE';
   document.querySelector('.res').style.display = 'block';
   const scores = document.querySelector('.scores');
   scores.textContent = score + '%';
@@ -114,12 +111,8 @@ function nextQuestion() {
   progressWidth = 100;
   questionNumber++;
 
-  if (questionNumber === 10) {
-    questionNumber = 10;
-    btn.textContent = 'DONE';
-    showScore();
-  }
-
+  if (questionNumber === 10) return showScore();
+  
   qn.textContent = questionNumber + '/10';
   fetchQuestion(questionNumber);
 }
@@ -128,11 +121,40 @@ resbtn.addEventListener('click', () => {
   location.reload();
 });
 
-function showError() {
+/* function showError() {
   errorPage.style.display = 'block';
   message.textContent = 'An Error Occurred';
-}
+} */
 
 const rel = () => {
   location.reload();
 };
+
+
+function handleCheck(){
+   btn.disabled = true
+
+  const optt = document.querySelectorAll('.opt1');
+      optt.forEach((option) => {
+        
+          
+        option.addEventListener('click', () => {
+        clearInterval(timeInterval)
+
+          option.classList.remove('correct');
+          option.classList.remove('wrong');
+          choice = option.querySelector('.spa').textContent;
+          option.querySelector('.radiocheck').setAttribute('checked', 'true');
+          option.classList.add(choice === correctAnswer ? 'correct' : 'wrong');
+          
+             is_checked = true
+             if(is_checked){
+              optt.forEach((option) =>{
+                option.disabled = true
+               })
+               btn.disabled = false
+             }
+
+        });
+      });
+}
