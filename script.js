@@ -93,7 +93,7 @@ function showScore() {
   btn.textContent = 'DONE';
   document.querySelector('.res').style.display = 'block';
   const scores = document.querySelector('.scores');
-  scores.textContent = score + '%';
+  scores.textContent = `${score} %`;
   document.querySelector('.qn1').textContent = questionNumber + '/10';
 }
 
